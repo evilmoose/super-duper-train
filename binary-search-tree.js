@@ -129,14 +129,36 @@ class BinarySearchTree {
    * Return an array of visited nodes. */
 
   dfsPostOrder() {
+    let result = [];
 
+    function traverse(node) {
+      if (node.left) traverse(node.left);
+      if (node.right) traverse(node.right);
+      result.push(node.val);
+    }
+
+    traverse(this.root);
+    return result;
   }
 
   /** bfs(): Traverse the array using BFS.
    * Return an array of visited nodes. */
 
   bfs() {
+    let node = this.root;
+    let queue = [];
+    let result = [];
 
+    queue.push(node);
+
+    while (queue.length) {
+      node = queue.shift();
+      result.push(node.val);
+      if (node.left) queue.push(node.left);
+      if (node.right) queue.push(node.right);
+    }
+
+    return result;
   }
 
   /** Further Study!
@@ -144,7 +166,42 @@ class BinarySearchTree {
    * Returns the removed node. */
 
   remove(val) {
+    const removeNode = (node, val) => {
+      if (!node) return null;
 
+      if (val < node.val) {
+        node.left = removeNode(node.left, val);
+        return node;
+      } else if (val > node.val) {
+        node.right = removeNode(node.right, val);
+        return node;
+      } else {
+        // Node to be deleted found
+        // Node with no children (leaf node)
+        if (!node.left && !node.right) return null;
+        
+        // Node with one child
+        if (!node.left) return node.right;
+        if (!node.right) return node.left;
+        
+        // Node with two children
+        let temp = this.findMin(node.right);
+        node.val = temp.val;
+        node.right = removeNode(node.right, temp.val);
+        return node;
+      }
+    };
+    
+    const nodeToRemove = this.find(val);
+    this.root = removeNode(this.root, val);
+    return nodeToRemove;
+  }
+
+  findMin(node) {
+    while (node.left) {
+      node = node.left;
+    }
+    return node;
   }
 
   /** Further Study!
